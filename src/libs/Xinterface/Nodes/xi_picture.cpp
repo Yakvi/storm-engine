@@ -200,7 +200,7 @@ void CXI_PICTURE::SetNewPictureFromDir(char *dirName)
 
     sprintf_s(param, "resource\\textures\\%s\\*.tx", dirName);
 
-    auto *h = fio->_FindFirstFile(param, &wfd);
+    auto *h = fio->d_FindFirstFile(param, &wfd);
     for (findQ = 0; h != INVALID_HANDLE_VALUE;)
     {
         findQ++;
@@ -213,7 +213,7 @@ void CXI_PICTURE::SetNewPictureFromDir(char *dirName)
     if (findQ > 0)
     {
         findQ = rand() % findQ;
-        h = fio->_FindFirstFile(param, &wfd);
+        h = fio->d_FindFirstFile(param, &wfd);
         if (h != INVALID_HANDLE_VALUE)
             for (; findQ > 0; findQ--)
             {

@@ -101,7 +101,7 @@ void MAST::Execute(uint32_t Delta_Time)
         // ====================================================
         // If the ini-file has been changed, read the info from it
         WIN32_FIND_DATA wfd;
-        auto *const h = fio->_FindFirstFile(MAST_INI_FILE, &wfd);
+        auto *const h = fio->d_FindFirstFile(MAST_INI_FILE, &wfd);
         if (INVALID_HANDLE_VALUE != h)
         {
             auto ft_new = wfd.ftLastWriteTime;
@@ -414,7 +414,7 @@ void MAST::LoadIni()
 
     INIFILE *ini;
     WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->_FindFirstFile(MAST_INI_FILE, &wfd);
+    const HANDLE h = fio->d_FindFirstFile(MAST_INI_FILE, &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;

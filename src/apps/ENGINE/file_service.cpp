@@ -2,6 +2,7 @@
 #include "storm_assert.h"
 #include "utf8.h"
 #include "core.h"
+#include "wildcmp.hpp"
 
 #include <exception>
 #include <string>
@@ -91,7 +92,43 @@ bool FILE_SERVICE::_ReadFile(std::fstream &fileS, void *s, std::streamsize count
     }
 }
 
-HANDLE FILE_SERVICE::_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData)
+bool FILE_SERVICE::_FileOrDirectoryExists(const char *p)
+{
+    std::filesystem::path path = std::filesystem::u8path(p);
+    return std::filesystem::exists(path);
+}
+
+std::vector<std::string> FILE_SERVICE::_GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask,
+                                                                  bool getPaths, bool onlyDirs, bool onlyFiles)
+{
+    std::vector<std::string> result;
+    std::filesystem::path curPath;
+
+    for (auto &dirEntry : std::filesystem::directory_iterator(sourcePath))
+    {
+        bool thisIsDir = dirEntry.is_directory();
+        if ((onlyFiles && thisIsDir) || (onlyDirs && !thisIsDir))
+        {
+            continue;
+        }
+        curPath = dirEntry.path();
+        if (storm::wildicmp(mask, curPath.filename().string().c_str()))
+        {
+            if (getPaths)
+            {
+                result.push_back(curPath.string());
+            }
+            else
+            {
+                result.push_back(curPath.filename().string());
+            }
+        }
+    }
+
+    return result;
+}
+
+HANDLE FILE_SERVICE::d_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData)
 {
     HANDLE hFile;
     std::wstring filePathW = utf8::ConvertUtf8ToWide(lpFileName);
@@ -154,10 +191,10 @@ BOOL FILE_SERVICE::_CreateDirectory(const char *lpPathName, LPSECURITY_ATTRIBUTE
     return CreateDirectory(PathNameW.c_str(), lpSecurityAttributes);
 }
 
-BOOL FILE_SERVICE::_RemoveDirectory(const char *lpPathName)
+std::uintmax_t FILE_SERVICE::_RemoveDirectory(const char *p)
 {
-    std::wstring PathNameW = utf8::ConvertUtf8ToWide(lpPathName);
-    return RemoveDirectory(PathNameW.c_str());
+    std::filesystem::path path = std::filesystem::u8path(p);
+    return std::filesystem::remove_all(path);
 }
 
 BOOL FILE_SERVICE::_SetFileAttributes(const char *lpFileName, uint32_t dwFileAttributes)

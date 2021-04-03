@@ -320,7 +320,7 @@ void SAIL::Execute(uint32_t Delta_Time)
         // ====================================================
         // If the ini-file has been changed, read the info from it
         WIN32_FIND_DATA wfd;
-        auto *h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+        auto *h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
         if (INVALID_HANDLE_VALUE != h)
         {
             auto ft_new = wfd.ftLastWriteTime;
@@ -1348,7 +1348,7 @@ void SAIL::LoadSailIni()
 
     INIFILE *ini;
     WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+    const HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;

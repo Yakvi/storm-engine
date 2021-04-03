@@ -1036,7 +1036,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         else
         {
             WIN32_FIND_DATA wfd;
-            HANDLE h = fio->_FindFirstFile(param, &wfd);
+            HANDLE h = fio->d_FindFirstFile(param, &wfd);
             if (h != INVALID_HANDLE_VALUE)
             {
                 FILETIME ftime;
@@ -2890,7 +2890,7 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
             sprintf_s(param, "%s\\*", sSavePath);
         }
         // start save file finding
-        const HANDLE h = fio->_FindFirstFile(param, &wfd);
+        const HANDLE h = fio->d_FindFirstFile(param, &wfd);
         if (h != INVALID_HANDLE_VALUE)
         {
             do
@@ -2948,7 +2948,7 @@ bool XINTERFACE::NewSaveFileName(char *fileName) const
     else
         sprintf_s(param, "%s\\%s", sSavePath, fileName);
 
-    const HANDLE h = fio->_FindFirstFile(param, &wfd);
+    const HANDLE h = fio->d_FindFirstFile(param, &wfd);
     if (h == INVALID_HANDLE_VALUE)
         return true;
 
@@ -2959,20 +2959,20 @@ bool XINTERFACE::NewSaveFileName(char *fileName) const
 void XINTERFACE::DeleteSaveFile(char *fileName)
 {
     if (fileName == nullptr)
+    {
         return;
+    }
     char param[256];
     char *sSavePath = AttributesPointer->GetAttribute("SavePath");
-    WIN32_FIND_DATA wfd;
     if (sSavePath == nullptr)
-        sprintf_s(param, "%s", fileName);
-    else
-        sprintf_s(param, "%s\\%s", sSavePath, fileName);
-    const HANDLE h = fio->_FindFirstFile(param, &wfd);
-    if (INVALID_HANDLE_VALUE != h)
     {
-        fio->_FindClose(h);
-        fio->_DeleteFile(param);
+        sprintf_s(param, "%s", fileName);
     }
+    else
+    {
+        sprintf_s(param, "%s\\%s", sSavePath, fileName);
+    }
+    fio->_DeleteFile(param);
 }
 
 uint32_t XINTERFACE_BASE::GetBlendColor(uint32_t minCol, uint32_t maxCol, float fBlendFactor)
@@ -3445,7 +3445,7 @@ int XINTERFACE::LoadIsExist()
         sprintf_s(param, "%s\\*", sSavePath);
     }
 
-    const HANDLE h = fio->_FindFirstFile(param, &wfd);
+    const HANDLE h = fio->d_FindFirstFile(param, &wfd);
     bool bFindFile = h != INVALID_HANDLE_VALUE;
     for (int findQ = 0; bFindFile; findQ++)
     {

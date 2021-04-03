@@ -228,10 +228,6 @@ void XSERVICE::LoadAllPicturesInfo()
     INIFILE *ini;
 
     // initialize ini file
-    WIN32_FIND_DATA wfd;
-    auto *const h = fio->_FindFirstFile(LISTS_INIFILE, &wfd);
-    if (INVALID_HANDLE_VALUE != h)
-        fio->_FindClose(h);
     ini = fio->OpenIniFile((char *)LISTS_INIFILE);
     if (!ini)
         throw std::exception("ini file not found!");

@@ -6,6 +6,8 @@
 #include "s_import_func.h"
 #include "v_s_stack.h"
 
+#include <filesystem>
+
 #define USER_BLOCK_BEGINER '{'
 #define USER_BLOCK_ENDING '}'
 
@@ -1344,51 +1346,31 @@ uint32_t _InterfaceCheckFolder(VS_STACK *pS)
     VDATA *pDat;
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
+    {
         return IFUNCRESULT_FAILED;
+    }
     char *sFolderName = pDat->GetString();
-    long nSuccess = false;
+    /*long nSuccess = false;
     WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->_FindFirstFile(sFolderName, &wfd);
+    const HANDLE h = fio->d_FindFirstFile(sFolderName, &wfd);
     if (h != INVALID_HANDLE_VALUE)
     {
         fio->_FindClose(h);
         nSuccess = true;
-    }
+    }*/
+    long nSuccess = fio->_FileOrDirectoryExists(sFolderName);
     pDat = (VDATA *)pS->Push();
     if (!pDat)
+    {
         return IFUNCRESULT_FAILED;
+    }
     pDat->Set(nSuccess);
     return IFUNCRESULT_OK;
 }
 
-BOOL DeleteFolderWithCantainment(const char *sFolderName)
+bool DeleteFolderWithCantainment(const char *sFolderName)
 {
-    WIN32_FIND_DATA wfd;
-    const HANDLE hff = fio->_FindFirstFile((sFolderName + std::string("\\*.*")).c_str(), &wfd);
-    if (hff != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            std::string sFileName = sFolderName + std::string("\\");
-            if (wfd.cAlternateFileName[0])
-                sFileName += utf8::ConvertWideToUtf8(wfd.cAlternateFileName).c_str();
-            else
-                sFileName += utf8::ConvertWideToUtf8(wfd.cFileName).c_str();
-
-            if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            {
-                if (wfd.cFileName[0] == L'.')
-                    continue;
-                DeleteFolderWithCantainment(sFileName.c_str());
-            }
-            else
-            {
-                fio->_DeleteFile(sFileName.c_str());
-            }
-        } while (fio->_FindNextFile(hff, &wfd));
-        fio->_FindClose(hff);
-    }
-    return fio->_RemoveDirectory(sFolderName);
+    return (fio->_RemoveDirectory(sFolderName) > 0);
 }
 
 uint32_t _InterfaceDeleteFolder(VS_STACK *pS)
@@ -1412,14 +1394,18 @@ uint32_t _InterfaceFindFolders(VS_STACK *pS)
     VDATA *pDat;
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
+    {
         return IFUNCRESULT_FAILED;
+    }
     ATTRIBUTES *pA = pDat->GetAClass();
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
+    {
         return IFUNCRESULT_FAILED;
-    char *sFindTemplate = pDat->GetString();
+    }
+    /*char *sFindTemplate = pDat->GetString();
     WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->_FindFirstFile(sFindTemplate, &wfd);
+    const HANDLE h = fio->d_FindFirstFile(sFindTemplate, &wfd);
     long n = 0;
     if (h != INVALID_HANDLE_VALUE)
         do
@@ -1436,10 +1422,25 @@ uint32_t _InterfaceFindFolders(VS_STACK *pS)
             }
         } while (fio->_FindNextFile(h, &wfd));
     if (h != INVALID_HANDLE_VALUE)
-        fio->_FindClose(h);
+        fio->_FindClose(h);*/
+    std::string sFindTemplate = pDat->GetString();
+    std::replace(sFindTemplate.begin(), sFindTemplate.end(), '\\', '/');
+    std::filesystem::path p = std::filesystem::u8path(sFindTemplate);
+    const auto mask = p.filename().string();
+    const auto vFilenames =
+        fio->_GetPathsOrFilenamesByMask(p.remove_filename().string().c_str(), mask.c_str(), false, true, false);
+    long n = 0;
+    for (std::string curName : vFilenames)
+    {
+        char pctmp[64];
+        sprintf_s(pctmp, "f%d", n++);
+        pA->SetAttribute(pctmp, curName.c_str());
+    }
     pDat = (VDATA *)pS->Push();
     if (!pDat)
+    {
         return IFUNCRESULT_FAILED;
+    }
     const long nSuccess = (pA->GetAttributesNum() > 0);
     pDat->Set(nSuccess);
     return IFUNCRESULT_OK;

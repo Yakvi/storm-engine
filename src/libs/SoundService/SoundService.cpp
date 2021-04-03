@@ -983,12 +983,12 @@ void SoundService::LoadAliasFile(const char *_filename)
 
 void SoundService::InitAliases()
 {
-    std::string iniName = ALIAS_DIRECTORY;
+    /*std::string iniName = ALIAS_DIRECTORY;
     iniName += "*.ini";
 
     HANDLE foundFile;
     WIN32_FIND_DATA findData;
-    if ((foundFile = fio->_FindFirstFile(iniName.c_str(), &findData)) != INVALID_HANDLE_VALUE)
+    if ((foundFile = fio->d_FindFirstFile(iniName.c_str(), &findData)) != INVALID_HANDLE_VALUE)
     {
         do
         {
@@ -997,6 +997,11 @@ void SoundService::InitAliases()
         } while (fio->_FindNextFile(foundFile, &findData) == TRUE);
         if (foundFile != INVALID_HANDLE_VALUE)
             fio->_FindClose(foundFile);
+    }*/
+    const auto vFilenames = fio->_GetPathsOrFilenamesByMask(ALIAS_DIRECTORY, "*.ini", false);
+    for (std::string curName : vFilenames)
+    {
+        LoadAliasFile(curName.c_str());
     }
 }
 

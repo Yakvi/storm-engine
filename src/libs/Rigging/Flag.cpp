@@ -85,7 +85,7 @@ void FLAG::Execute(uint32_t Delta_Time)
         // ====================================================
         // If the ini-file has been changed, read the info from it
         WIN32_FIND_DATA wfd;
-        auto *const h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+        auto *const h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
         if (INVALID_HANDLE_VALUE != h)
         {
             auto ft_new = wfd.ftLastWriteTime;
@@ -570,7 +570,7 @@ void FLAG::LoadIni()
 
     INIFILE *ini;
     WIN32_FIND_DATA wfd;
-    auto *const h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+    auto *const h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;

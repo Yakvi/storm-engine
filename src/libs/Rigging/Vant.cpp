@@ -90,7 +90,7 @@ void VANT_BASE::Execute(uint32_t Delta_Time)
         // ====================================================
         // If the ini-file has been changed, read the info from it
         WIN32_FIND_DATA wfd;
-        auto *const h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+        auto *const h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
         if (INVALID_HANDLE_VALUE != h)
         {
             auto ft_new = wfd.ftLastWriteTime;
@@ -632,7 +632,7 @@ void VANT::LoadIni()
 
     INIFILE *ini;
     WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+    const HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;
@@ -716,7 +716,7 @@ void VANTL::LoadIni()
 
     INIFILE *ini;
     WIN32_FIND_DATA wfd;
-    HANDLE h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+    HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;
@@ -800,7 +800,7 @@ void VANTZ::LoadIni()
 
     INIFILE *ini;
     WIN32_FIND_DATA wfd;
-    HANDLE h = fio->_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
+    HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;

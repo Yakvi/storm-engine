@@ -290,7 +290,7 @@ bool FINDFILESINTODIRECTORY::Init()
         else
             strcat_s(fullName, "*.*");
         WIN32_FIND_DATA finddat;
-        auto *const hdl = fio->_FindFirstFile(fullName, &finddat);
+        auto *const hdl = fio->d_FindFirstFile(fullName, &finddat);
         auto *pA = AttributesPointer->CreateSubAClass(AttributesPointer, "filelist");
         for (auto file_idx = 0; hdl != INVALID_HANDLE_VALUE; file_idx++)
         {
