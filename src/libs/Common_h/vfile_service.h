@@ -26,6 +26,9 @@ class VFILE_SERVICE
     virtual bool _FileOrDirectoryExists(const char *p) = 0;
     virtual std::vector<std::string> _GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask, bool getPaths,
                                                                 bool onlyDirs = false, bool onlyFiles = true) = 0;
+    virtual std::vector<std::filesystem::path> _GetFsPathsByMask(const char *sourcePath, const char *mask,
+                                                                 bool getPaths, bool onlyDirs = false,
+                                                                 bool onlyFiles = true) = 0;
     virtual HANDLE d_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData) = 0;
     virtual BOOL _FindNextFile(HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData) = 0;
     virtual BOOL _FindClose(HANDLE hFindFile) = 0;

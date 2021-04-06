@@ -2820,7 +2820,9 @@ void XINTERFACE::ReleaseSaveFindList()
 void XINTERFACE::AddFindData(const char *sSaveFileName, long file_size, FILETIME file_time)
 {
     if (!sSaveFileName || sSaveFileName[0] == '\0')
+    {
         return;
+    }
     auto *p = new SAVE_FIND_DATA;
     if (p)
     {
@@ -2838,7 +2840,9 @@ void XINTERFACE::AddFindData(const char *sSaveFileName, long file_size, FILETIME
 void XINTERFACE::Sorting_FindData()
 {
     if (!m_pSaveFindRoot)
+    {
         return; // do nothing (empty list)
+    }
     bool bMakeSorting = true;
     while (bMakeSorting)
     {
@@ -2877,7 +2881,6 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
 {
     if (!m_pSaveFindRoot) // create save file list
     {
-        // different function save file find for XBOX or PC
         WIN32_FIND_DATA wfd;
         // get file name for searching (whith full path)
         char param[1024];
@@ -2904,6 +2907,19 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
             // close handle for file finding
             fio->_FindClose(h);
         }
+        /*char *sSavePath = AttributesPointer->GetAttribute("SavePath");
+        if (sSavePath != nullptr)
+        {
+            fio->_CreateDirectory(sSavePath, nullptr);
+        }
+
+        // start save file finding
+        const auto vFilenames = fio->_GetPathsOrFilenamesByMask(sSavePath, "*", false);
+        for (std::string filename : vFilenames)
+        {
+            AddFindData(filename.c_str(), 0, wfd.ftLastWriteTime);
+        }*/
+
         // common part
         Sorting_FindData();
     }
@@ -2936,24 +2952,30 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
 bool XINTERFACE::NewSaveFileName(char *fileName) const
 {
     if (fileName == nullptr)
+    {
         return false;
+    }
 
-    char *sSavePath;
     char param[256];
-    WIN32_FIND_DATA wfd;
-    sSavePath = AttributesPointer->GetAttribute("SavePath");
+    //WIN32_FIND_DATA wfd;
+    char *sSavePath = AttributesPointer->GetAttribute("SavePath");
 
     if (sSavePath == nullptr)
+    {
         sprintf_s(param, "%s", fileName);
+    }
     else
+    {
         sprintf_s(param, "%s\\%s", sSavePath, fileName);
+    }
 
-    const HANDLE h = fio->d_FindFirstFile(param, &wfd);
+    /*const HANDLE h = fio->d_FindFirstFile(param, &wfd);
     if (h == INVALID_HANDLE_VALUE)
         return true;
 
     fio->_FindClose(h);
-    return false;
+    return false;*/
+    return !(fio->_FileOrDirectoryExists(param));
 }
 
 void XINTERFACE::DeleteSaveFile(char *fileName)
@@ -3432,9 +3454,11 @@ int XINTERFACE::LoadIsExist()
 {
     char *sCurLngName = GetStringService()->GetLanguage();
     if (sCurLngName == nullptr)
+    {
         return 0;
+    }
 
-    WIN32_FIND_DATA wfd;
+    /*WIN32_FIND_DATA wfd;
     char param[1024];
     char *sSavePath = AttributesPointer->GetAttribute("SavePath");
     if (sSavePath == nullptr)
@@ -3480,7 +3504,43 @@ int XINTERFACE::LoadIsExist()
         bFindFile = fio->_FindNextFile(h, &wfd) != 0;
     }
     if (h != INVALID_HANDLE_VALUE)
-        fio->_FindClose(h);
+        fio->_FindClose(h);*/
+    char param[1024];
+    char *sSavePath = AttributesPointer->GetAttribute("SavePath");
+    if (sSavePath != nullptr)
+    {
+        fio->_CreateDirectory(sSavePath, nullptr);
+    }
+
+    bool bFindFile = false;
+    const auto vFilenames = fio->_GetPathsOrFilenamesByMask(sSavePath, "*", true);
+    for (std::string path : vFilenames)
+    {
+        char datBuf[512];
+        sprintf(param, path.c_str());
+        if (SFLB_GetSaveFileData(param, sizeof(datBuf), datBuf))
+        {
+            int nLen = strlen(datBuf);
+            int i;
+            for (i = strlen(datBuf); i >= 0 && datBuf[i] != '@'; i--)
+                ;
+            if (i < 0)
+            {
+                i = 0;
+            }
+            if (datBuf[i] == '@')
+            {
+                i++;
+            }
+            if (_stricmp(sCurLngName, &datBuf[i]) == 0)
+            {
+                bFindFile = true;
+                break;
+            }
+        }
+    }
+
+
     return bFindFile ? 1 : 0;
 }
 

@@ -291,6 +291,7 @@ class XINTERFACE : public XINTERFACE_BASE
     {
         char *save_file_name;
         long file_size;
+        // std::filesystem::file_time_type time;
         FILETIME time;
 
         SAVE_FIND_DATA *next;

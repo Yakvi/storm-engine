@@ -96,6 +96,8 @@ class FILE_SERVICE : public VFILE_SERVICE
     bool _FileOrDirectoryExists(const char *p) override;
     std::vector<std::string> _GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask, bool getPaths,
                                                   bool onlyDirs = false, bool onlyFiles = true) override;
+    std::vector<std::filesystem::path> _GetFsPathsByMask(const char *sourcePath, const char *mask, bool getPaths,
+                                                         bool onlyDirs = false, bool onlyFiles = true) override;
     HANDLE d_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData) override;
     BOOL _FindNextFile(HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData) override;
     BOOL _FindClose(HANDLE hFindFile) override;

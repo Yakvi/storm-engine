@@ -102,9 +102,33 @@ std::vector<std::string> FILE_SERVICE::_GetPathsOrFilenamesByMask(const char *so
                                                                   bool getPaths, bool onlyDirs, bool onlyFiles)
 {
     std::vector<std::string> result;
-    std::filesystem::path curPath;
 
-    for (auto &dirEntry : std::filesystem::directory_iterator(sourcePath))
+    const auto fsPaths = _GetFsPathsByMask(sourcePath, mask, getPaths, onlyDirs, onlyFiles);
+    for (std::filesystem::path curPath : fsPaths)
+    {
+        result.push_back(curPath.string());
+    }
+
+    return result;
+}
+
+std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *sourcePath, const char *mask,
+                                                                   bool getPaths, bool onlyDirs, bool onlyFiles)
+{
+    std::vector<std::filesystem::path> result;
+
+    std::filesystem::path srcPath;
+    if (sourcePath == nullptr || sourcePath == "")
+    {
+        srcPath = std::filesystem::current_path();
+    }
+    else
+    {
+        srcPath = std::filesystem::u8path(sourcePath);
+    }
+
+    std::filesystem::path curPath;
+    for (auto &dirEntry : std::filesystem::directory_iterator(srcPath))
     {
         bool thisIsDir = dirEntry.is_directory();
         if ((onlyFiles && thisIsDir) || (onlyDirs && !thisIsDir))
@@ -116,11 +140,11 @@ std::vector<std::string> FILE_SERVICE::_GetPathsOrFilenamesByMask(const char *so
         {
             if (getPaths)
             {
-                result.push_back(curPath.string());
+                result.push_back(curPath);
             }
             else
             {
-                result.push_back(curPath.filename().string());
+                result.push_back(curPath.filename());
             }
         }
     }

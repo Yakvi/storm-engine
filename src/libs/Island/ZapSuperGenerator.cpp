@@ -2,6 +2,7 @@
 #include "tga.h"
 #include "vfile_service.h"
 
+// dead code
 /*bool ISLAND::DoZapSuperGeneratorDecodeFile(const char *sname)
 {
     auto fileS = fio->_CreateFile(sname, std::ios::binary | std::ios::in);

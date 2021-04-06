@@ -281,7 +281,7 @@ bool FINDFILESINTODIRECTORY::Init()
     {
         auto *const dirName = AttributesPointer->GetAttribute("dir");
         auto *const maskName = AttributesPointer->GetAttribute("mask");
-        char fullName[512];
+        /*char fullName[512];
         fullName[0] = 0;
         if (dirName)
             sprintf_s(fullName, "%s\\", dirName);
@@ -305,7 +305,26 @@ bool FINDFILESINTODIRECTORY::Init()
                 break;
         }
         if (hdl != INVALID_HANDLE_VALUE)
-            fio->_FindClose(hdl);
+            fio->_FindClose(hdl);*/
+        const char *curMask;
+        if (maskName)
+        {
+            curMask = maskName;
+        }
+        else
+        {
+            curMask = "*.*";
+        }
+        auto file_idx = 0;
+        auto *pA = AttributesPointer->CreateSubAClass(AttributesPointer, "filelist");
+        const auto vFilenames = fio->_GetPathsOrFilenamesByMask(dirName, curMask, false);
+        for (std::string filename : vFilenames)
+        {
+            char sname[32];
+            sprintf(sname, "id%d", file_idx);
+            pA->SetAttribute(sname, filename.c_str());
+            file_idx++;
+        }
         return true;
     }
     core.Trace("Attributes Pointer into class FINDFILESINTODIRECTORY = NULL");
