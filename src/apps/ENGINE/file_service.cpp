@@ -6,7 +6,6 @@
 
 #include <exception>
 #include <string>
-#include <filesystem>
 
 #define COMMENT ';'
 #define SECTION_A '['
@@ -152,7 +151,22 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
     return result;
 }
 
-HANDLE FILE_SERVICE::d_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData)
+std::time_t FILE_SERVICE::_ToTimeT(std::filesystem::file_time_type tp)
+{
+    using namespace std::chrono;
+    auto sctp = time_point_cast<system_clock::duration>(tp - std::filesystem::file_time_type::clock::now() +
+                                                        system_clock::now());
+    return system_clock::to_time_t(sctp);
+}
+
+std::filesystem::file_time_type FILE_SERVICE::_GetLastWriteTime(const char *filename)
+{
+    std::filesystem::path path = std::filesystem::u8path(filename);
+    return std::filesystem::last_write_time(path);
+
+}
+
+/*HANDLE FILE_SERVICE::_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData)
 {
     HANDLE hFile;
     std::wstring filePathW = utf8::ConvertUtf8ToWide(lpFileName);
@@ -168,7 +182,7 @@ BOOL FILE_SERVICE::_FindNextFile(HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileD
 BOOL FILE_SERVICE::_FindClose(HANDLE hFindFile)
 {
     return FindClose(hFindFile);
-}
+}*/
 
 void FILE_SERVICE::_FlushFileBuffers(std::fstream &fileS)
 {

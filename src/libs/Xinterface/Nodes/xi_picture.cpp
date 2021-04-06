@@ -194,7 +194,7 @@ void CXI_PICTURE::SetNewPicture(bool video, char *sNewTexName)
 
 void CXI_PICTURE::SetNewPictureFromDir(char *dirName)
 {
-    int findQ;
+    /*int findQ;
     WIN32_FIND_DATA wfd;
     char param[512];
 
@@ -230,6 +230,21 @@ void CXI_PICTURE::SetNewPictureFromDir(char *dirName)
                 param[paramlen - 3] = 0;
             SetNewPicture(false, param);
         }
+    }*/
+    char param[512];
+    sprintf(param, "resource\\textures\\%s", dirName);
+
+    const auto vFilenames = fio->_GetPathsOrFilenamesByMask(param, "*.tx", false);
+    if (!vFilenames.empty())
+    {
+        int findQ = rand() % vFilenames.size();
+        sprintf(param, "%s\\%s", dirName, vFilenames[findQ].c_str());
+        const int paramlen = strlen(param);
+        if (paramlen < sizeof(param) && paramlen >= 3)
+        {
+            param[paramlen - 3] = 0;
+        }
+        SetNewPicture(false, param);
     }
 }
 

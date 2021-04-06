@@ -9,6 +9,8 @@
 #include "inode.h"
 #include "vmodule_api.h"
 
+#include <filesystem>
+
 class CXI_WINDOW;
 
 class XINTERFACE : public XINTERFACE_BASE
@@ -291,15 +293,14 @@ class XINTERFACE : public XINTERFACE_BASE
     {
         char *save_file_name;
         long file_size;
-        // std::filesystem::file_time_type time;
-        FILETIME time;
+        std::filesystem::file_time_type time;
 
         SAVE_FIND_DATA *next;
     };
 
     SAVE_FIND_DATA *m_pSaveFindRoot;
     void ReleaseSaveFindList();
-    void AddFindData(const char *sSaveFileName, long file_size, FILETIME create_time);
+    void AddFindData(std::filesystem::path filePath);
     void Sorting_FindData();
     SAVE_FIND_DATA *GetSaveDataByIndex(int n) const;
 

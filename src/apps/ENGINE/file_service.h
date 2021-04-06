@@ -98,9 +98,8 @@ class FILE_SERVICE : public VFILE_SERVICE
                                                   bool onlyDirs = false, bool onlyFiles = true) override;
     std::vector<std::filesystem::path> _GetFsPathsByMask(const char *sourcePath, const char *mask, bool getPaths,
                                                          bool onlyDirs = false, bool onlyFiles = true) override;
-    HANDLE d_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData) override;
-    BOOL _FindNextFile(HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData) override;
-    BOOL _FindClose(HANDLE hFindFile) override;
+    std::time_t _ToTimeT(std::filesystem::file_time_type tp) override;
+    std::filesystem::file_time_type _GetLastWriteTime(const char *filename) override;
     void _FlushFileBuffers(std::fstream &fileS) override;
     uint32_t _GetCurrentDirectory(uint32_t nBufferLength, char *lpBuffer) override;
     std::string _GetExecutableDirectory() override;

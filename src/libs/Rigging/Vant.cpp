@@ -89,14 +89,18 @@ void VANT_BASE::Execute(uint32_t Delta_Time)
     {
         // ====================================================
         // If the ini-file has been changed, read the info from it
-        WIN32_FIND_DATA wfd;
+        /*WIN32_FIND_DATA wfd;
         auto *const h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
         if (INVALID_HANDLE_VALUE != h)
         {
             auto ft_new = wfd.ftLastWriteTime;
             fio->_FindClose(h);
 
-            if (CompareFileTime(&ft_old, &ft_new) != 0)
+            if (CompareFileTime(&ft_old, &ft_new) != 0)*/
+        if (fio->_FileOrDirectoryExists("resource\\ini\\rigging.ini"))
+        {
+            auto ft_new = fio->_GetLastWriteTime("resource\\ini\\rigging.ini");
+            if (ft_old != ft_new)
             {
                 LoadIni();
             }
@@ -631,12 +635,16 @@ void VANT::LoadIni()
     char param[256];
 
     INIFILE *ini;
-    WIN32_FIND_DATA wfd;
+    /*WIN32_FIND_DATA wfd;
     const HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;
         fio->_FindClose(h);
+    }*/
+    if (fio->_FileOrDirectoryExists("resource\\ini\\rigging.ini"))
+    {
+        ft_old = fio->_GetLastWriteTime("resource\\ini\\rigging.ini");
     }
     ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
     if (!ini)
@@ -715,12 +723,16 @@ void VANTL::LoadIni()
     char param[256];
 
     INIFILE *ini;
-    WIN32_FIND_DATA wfd;
+    /*WIN32_FIND_DATA wfd;
     HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;
         fio->_FindClose(h);
+    }*/
+    if (fio->_FileOrDirectoryExists("resource\\ini\\rigging.ini"))
+    {
+        ft_old = fio->_GetLastWriteTime("resource\\ini\\rigging.ini");
     }
     ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
     if (!ini)
@@ -799,12 +811,16 @@ void VANTZ::LoadIni()
     char param[256];
 
     INIFILE *ini;
-    WIN32_FIND_DATA wfd;
+    /*WIN32_FIND_DATA wfd;
     HANDLE h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
     if (INVALID_HANDLE_VALUE != h)
     {
         ft_old = wfd.ftLastWriteTime;
         fio->_FindClose(h);
+    }*/
+    if (fio->_FileOrDirectoryExists("resource\\ini\\rigging.ini"))
+    {
+        ft_old = fio->_GetLastWriteTime("resource\\ini\\rigging.ini");
     }
     ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
     if (!ini)

@@ -1029,7 +1029,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
     case MSG_INTERFACE_GETTIME: {
         char param[1024];
         message.String(sizeof(param) - 1, param);
-        char param2[1024];
+        /*char param2[1024];
         SYSTEMTIME systTime;
         if (param[0] == 0)
             GetLocalTime(&systTime);
@@ -1052,10 +1052,41 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         if (pvdat)
             pvdat->Set(param2);
 
-        sprintf_s(param2, "%2.2d.%2.2d.%d", systTime.wDay, systTime.wMonth, systTime.wYear);
+        sprintf_s(param2, "%2.2d.%2.2d.%d", systTime.wDay, systTime.wMonth, systTime.wYear);*/
+        std::time_t systTime;
+        if (param[0] == 0)
+        {
+            systTime = std::time(nullptr);
+        }
+        else
+        {
+            std::filesystem::path p = std::filesystem::u8path(param);
+            const auto mask = p.filename().string();
+            const auto vFilenames = fio->_GetPathsOrFilenamesByMask(p.remove_filename().string().c_str(), mask.c_str(),
+                                                                    true, false, false);
+            if (vFilenames.empty())
+            {
+                systTime = std::time(nullptr);
+            }
+            else
+            {
+                systTime = fio->_ToTimeT(fio->_GetLastWriteTime(vFilenames[0].c_str()));
+            }
+        }
+        const auto locTime = std::localtime(&systTime);
+        char param2[1024];
+        std::strftime(param2, sizeof(param2), "%H:%M:%S", locTime);
+        VDATA *pvdat = message.ScriptVariablePointer();
+        if (pvdat)
+        {
+            pvdat->Set(param2);
+        }
+        std::strftime(param2, sizeof(param2), "%d.%m.%Y", locTime);
         pvdat = message.ScriptVariablePointer();
         if (pvdat)
+        {
             pvdat->Set(param2);
+        }
     }
     break;
 
@@ -2817,23 +2848,20 @@ void XINTERFACE::ReleaseSaveFindList()
     }
 }
 
-void XINTERFACE::AddFindData(const char *sSaveFileName, long file_size, FILETIME file_time)
+void XINTERFACE::AddFindData(std::filesystem::path filePath)
 {
-    if (!sSaveFileName || sSaveFileName[0] == '\0')
-    {
-        return;
-    }
     auto *p = new SAVE_FIND_DATA;
     if (p)
     {
-        p->time = file_time;
-        p->file_size = file_size;
+        const auto sSaveFileName = filePath.filename().string();
+        p->time = std::filesystem::last_write_time(filePath);
+        p->file_size = 0; // original code always passed 0 to file_size
         p->next = m_pSaveFindRoot;
         m_pSaveFindRoot = p;
-        const auto len = strlen(sSaveFileName) + 1;
+        const auto len = strlen(sSaveFileName.c_str()) + 1;
         p->save_file_name = new char[len];
         if (p->save_file_name)
-            memcpy(p->save_file_name, sSaveFileName, len);
+            memcpy(p->save_file_name, sSaveFileName.c_str(), len);
     }
 }
 
@@ -2850,7 +2878,7 @@ void XINTERFACE::Sorting_FindData()
         SAVE_FIND_DATA *pprev = nullptr;
         for (SAVE_FIND_DATA *pcur = m_pSaveFindRoot; pcur->next; pcur = pcur->next)
         {
-            if (CompareFileTime(&pcur->next->time, &pcur->time) > 0)
+            if (pcur->next->time > pcur->time)
             {
                 bMakeSorting = true;
                 SAVE_FIND_DATA *p1 = pcur;
@@ -2881,7 +2909,7 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
 {
     if (!m_pSaveFindRoot) // create save file list
     {
-        WIN32_FIND_DATA wfd;
+        /*WIN32_FIND_DATA wfd;
         // get file name for searching (whith full path)
         char param[1024];
         char *sSavePath = AttributesPointer->GetAttribute("SavePath");
@@ -2906,19 +2934,19 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
             } while (fio->_FindNextFile(h, &wfd) != 0);
             // close handle for file finding
             fio->_FindClose(h);
-        }
-        /*char *sSavePath = AttributesPointer->GetAttribute("SavePath");
+        }*/
+        char *sSavePath = AttributesPointer->GetAttribute("SavePath");
         if (sSavePath != nullptr)
         {
             fio->_CreateDirectory(sSavePath, nullptr);
         }
 
         // start save file finding
-        const auto vFilenames = fio->_GetPathsOrFilenamesByMask(sSavePath, "*", false);
-        for (std::string filename : vFilenames)
+        const auto vFilePaths = fio->_GetFsPathsByMask(sSavePath, "*", true);
+        for (std::filesystem::path filePath : vFilePaths)
         {
-            AddFindData(filename.c_str(), 0, wfd.ftLastWriteTime);
-        }*/
+            AddFindData(filePath);
+        }
 
         // common part
         Sorting_FindData();

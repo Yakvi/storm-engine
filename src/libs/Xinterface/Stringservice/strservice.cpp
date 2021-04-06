@@ -1423,8 +1423,7 @@ uint32_t _InterfaceFindFolders(VS_STACK *pS)
         } while (fio->_FindNextFile(h, &wfd));
     if (h != INVALID_HANDLE_VALUE)
         fio->_FindClose(h);*/
-    std::string sFindTemplate = pDat->GetString();
-    std::replace(sFindTemplate.begin(), sFindTemplate.end(), '\\', '/');
+    char *sFindTemplate = pDat->GetString();
     std::filesystem::path p = std::filesystem::u8path(sFindTemplate);
     const auto mask = p.filename().string();
     const auto vFilenames =
