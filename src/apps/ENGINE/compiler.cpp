@@ -7165,23 +7165,6 @@ DATA *COMPILER::GetOperand(const char *pCodeBase, uint32_t &ip, S_TOKEN_TYPE *pT
 
 void COMPILER::FormatAllDialog(const char *directory_name)
 {
-    /*WIN32_FIND_DATA ffd;
-    char sFileName[MAX_PATH];
-    sprintf_s(sFileName, "%s\\*.c", directory_name);
-    const HANDLE fh = fio->d_FindFirstFile(sFileName, &ffd);
-    if (fh != INVALID_HANDLE_VALUE)
-    {
-        std::string Utf8FileName = utf8::ConvertWideToUtf8(ffd.cFileName);
-        sprintf_s(sFileName, "%s\\%s", directory_name, Utf8FileName.c_str());
-        FormatDialog(sFileName);
-        while (fio->_FindNextFile(fh, &ffd))
-        {
-            Utf8FileName = utf8::ConvertWideToUtf8(ffd.cFileName);
-            sprintf_s(sFileName, "%s\\%s", directory_name, Utf8FileName.c_str());
-            FormatDialog(sFileName);
-        }
-        fio->_FindClose(fh);
-    }*/
     const auto vPaths = fio->_GetPathsOrFilenamesByMask(directory_name, "*.c", true);
     char sFileName[MAX_PATH];
     for (std::string curPath : vPaths)

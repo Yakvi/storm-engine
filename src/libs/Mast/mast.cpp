@@ -7,7 +7,7 @@
 #define DELTA_TIME(x) ((x)*0.001f)
 #define DELTA_TIME_ROTATE(x) ((x)*0.01f)
 
-const char *MAST_INI_FILE = "resource\\ini\\mast.ini";
+static const char *MAST_INI_FILE = "resource\\ini\\mast.ini";
 
 float MAST_MOVE_STEP = 0.2f;
 float MAST_FALL_STEP = .05f;
@@ -100,14 +100,6 @@ void MAST::Execute(uint32_t Delta_Time)
     {
         // ====================================================
         // If the ini-file has been changed, read the info from it
-        /*WIN32_FIND_DATA wfd;
-        auto *const h = fio->d_FindFirstFile(MAST_INI_FILE, &wfd);
-        if (INVALID_HANDLE_VALUE != h)
-        {
-            auto ft_new = wfd.ftLastWriteTime;
-            fio->_FindClose(h);
-
-            if (CompareFileTime(&ft_old, &ft_new) != 0)*/
         if (fio->_FileOrDirectoryExists(MAST_INI_FILE))
         {
             auto ft_new = fio->_GetLastWriteTime(MAST_INI_FILE);
@@ -417,13 +409,6 @@ void MAST::LoadIni()
     char section[256];
 
     INIFILE *ini;
-    /*WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->d_FindFirstFile(MAST_INI_FILE, &wfd);
-    if (INVALID_HANDLE_VALUE != h)
-    {
-        ft_old = wfd.ftLastWriteTime;
-        fio->_FindClose(h);
-    }*/
     if (fio->_FileOrDirectoryExists(MAST_INI_FILE))
     {
         ft_old = fio->_GetLastWriteTime(MAST_INI_FILE);

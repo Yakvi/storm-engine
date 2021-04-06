@@ -1029,30 +1029,6 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
     case MSG_INTERFACE_GETTIME: {
         char param[1024];
         message.String(sizeof(param) - 1, param);
-        /*char param2[1024];
-        SYSTEMTIME systTime;
-        if (param[0] == 0)
-            GetLocalTime(&systTime);
-        else
-        {
-            WIN32_FIND_DATA wfd;
-            HANDLE h = fio->d_FindFirstFile(param, &wfd);
-            if (h != INVALID_HANDLE_VALUE)
-            {
-                FILETIME ftime;
-                FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &ftime);
-                FileTimeToSystemTime(&ftime, &systTime);
-                fio->_FindClose(h);
-            }
-            else
-                GetLocalTime(&systTime);
-        }
-        sprintf_s(param2, "%2.2d:%2.2d:%2.2d", systTime.wHour, systTime.wMinute, systTime.wSecond);
-        VDATA *pvdat = message.ScriptVariablePointer();
-        if (pvdat)
-            pvdat->Set(param2);
-
-        sprintf_s(param2, "%2.2d.%2.2d.%d", systTime.wDay, systTime.wMonth, systTime.wYear);*/
         std::time_t systTime;
         if (param[0] == 0)
         {
@@ -2909,32 +2885,6 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
 {
     if (!m_pSaveFindRoot) // create save file list
     {
-        /*WIN32_FIND_DATA wfd;
-        // get file name for searching (whith full path)
-        char param[1024];
-        char *sSavePath = AttributesPointer->GetAttribute("SavePath");
-        if (sSavePath == nullptr)
-            sprintf_s(param, "*");
-        else
-        {
-            fio->_CreateDirectory(sSavePath, nullptr);
-            sprintf_s(param, "%s\\*", sSavePath);
-        }
-        // start save file finding
-        const HANDLE h = fio->d_FindFirstFile(param, &wfd);
-        if (h != INVALID_HANDLE_VALUE)
-        {
-            do
-            {
-                std::string FileName = utf8::ConvertWideToUtf8(wfd.cFileName);
-                // folders not be considers
-                if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                    continue;
-                AddFindData(FileName.c_str(), 0, wfd.ftLastWriteTime);
-            } while (fio->_FindNextFile(h, &wfd) != 0);
-            // close handle for file finding
-            fio->_FindClose(h);
-        }*/
         char *sSavePath = AttributesPointer->GetAttribute("SavePath");
         if (sSavePath != nullptr)
         {
@@ -2947,7 +2897,6 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
         {
             AddFindData(filePath);
         }
-
         // common part
         Sorting_FindData();
     }
@@ -2985,24 +2934,17 @@ bool XINTERFACE::NewSaveFileName(char *fileName) const
     }
 
     char param[256];
-    //WIN32_FIND_DATA wfd;
     char *sSavePath = AttributesPointer->GetAttribute("SavePath");
 
     if (sSavePath == nullptr)
     {
-        sprintf_s(param, "%s", fileName);
+        sprintf(param, "%s", fileName);
     }
     else
     {
-        sprintf_s(param, "%s\\%s", sSavePath, fileName);
+        sprintf(param, "%s\\%s", sSavePath, fileName);
     }
 
-    /*const HANDLE h = fio->d_FindFirstFile(param, &wfd);
-    if (h == INVALID_HANDLE_VALUE)
-        return true;
-
-    fio->_FindClose(h);
-    return false;*/
     return !(fio->_FileOrDirectoryExists(param));
 }
 
@@ -3016,11 +2958,11 @@ void XINTERFACE::DeleteSaveFile(char *fileName)
     char *sSavePath = AttributesPointer->GetAttribute("SavePath");
     if (sSavePath == nullptr)
     {
-        sprintf_s(param, "%s", fileName);
+        sprintf(param, "%s", fileName);
     }
     else
     {
-        sprintf_s(param, "%s\\%s", sSavePath, fileName);
+        sprintf(param, "%s\\%s", sSavePath, fileName);
     }
     fio->_DeleteFile(param);
 }
@@ -3486,53 +3428,6 @@ int XINTERFACE::LoadIsExist()
         return 0;
     }
 
-    /*WIN32_FIND_DATA wfd;
-    char param[1024];
-    char *sSavePath = AttributesPointer->GetAttribute("SavePath");
-    if (sSavePath == nullptr)
-        sprintf_s(param, "*");
-    else
-    {
-        fio->_CreateDirectory(sSavePath, nullptr);
-        sprintf_s(param, "%s\\*", sSavePath);
-    }
-
-    const HANDLE h = fio->d_FindFirstFile(param, &wfd);
-    bool bFindFile = h != INVALID_HANDLE_VALUE;
-    for (int findQ = 0; bFindFile; findQ++)
-    {
-        if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        {
-            bFindFile = fio->_FindNextFile(h, &wfd) != 0;
-            findQ--;
-            continue;
-        }
-
-        std::string FileName = utf8::ConvertWideToUtf8(wfd.cFileName);
-        if (sSavePath == nullptr)
-            sprintf_s(param, "%s", FileName.c_str());
-        else
-            sprintf_s(param, "%s\\%s", sSavePath, FileName.c_str());
-
-        char datBuf[512];
-        if (SFLB_GetSaveFileData(param, sizeof(datBuf), datBuf))
-        {
-            int nLen = strlen(datBuf);
-            int i;
-            for (i = strlen(datBuf); i >= 0 && datBuf[i] != '@'; i--)
-                ;
-            if (i < 0)
-                i = 0;
-            if (datBuf[i] == '@')
-                i++;
-            if (_stricmp(sCurLngName, &datBuf[i]) == 0)
-                break;
-        }
-
-        bFindFile = fio->_FindNextFile(h, &wfd) != 0;
-    }
-    if (h != INVALID_HANDLE_VALUE)
-        fio->_FindClose(h);*/
     char param[1024];
     char *sSavePath = AttributesPointer->GetAttribute("SavePath");
     if (sSavePath != nullptr)
@@ -3567,8 +3462,6 @@ int XINTERFACE::LoadIsExist()
             }
         }
     }
-
-
     return bFindFile ? 1 : 0;
 }
 

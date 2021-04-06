@@ -7,6 +7,8 @@
 #include "ship_base.h"
 #include "vfile_service.h"
 
+static const char *RIGGING_INI_FILE = "resource\\ini\\rigging.ini";
+
 FLAG::FLAG()
 {
     bUse = false;
@@ -84,17 +86,9 @@ void FLAG::Execute(uint32_t Delta_Time)
     {
         // ====================================================
         // If the ini-file has been changed, read the info from it
-        /*WIN32_FIND_DATA wfd;
-        auto *const h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
-        if (INVALID_HANDLE_VALUE != h)
+        if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
         {
-            auto ft_new = wfd.ftLastWriteTime;
-            fio->_FindClose(h);
-
-            if (CompareFileTime(&ft_old, &ft_new) != 0)*/
-        if (fio->_FileOrDirectoryExists("resource\\ini\\rigging.ini"))
-        {
-            auto ft_new = fio->_GetLastWriteTime("resource\\ini\\rigging.ini");
+            auto ft_new = fio->_GetLastWriteTime(RIGGING_INI_FILE);
             if (ft_old != ft_new)
             {
                 LoadIni();
@@ -573,18 +567,11 @@ void FLAG::LoadIni()
     char param[256];
 
     INIFILE *ini;
-    /*WIN32_FIND_DATA wfd;
-    auto *const h = fio->d_FindFirstFile("resource\\ini\\rigging.ini", &wfd);
-    if (INVALID_HANDLE_VALUE != h)
+    if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
     {
-        ft_old = wfd.ftLastWriteTime;
-        fio->_FindClose(h);
-    }*/
-    if (fio->_FileOrDirectoryExists("resource\\ini\\rigging.ini"))
-    {
-        ft_old = fio->_GetLastWriteTime("resource\\ini\\rigging.ini");
+        ft_old = fio->_GetLastWriteTime(RIGGING_INI_FILE);
     }
-    ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
+    ini = fio->OpenIniFile(RIGGING_INI_FILE);
     if (!ini)
         throw std::exception("rigging.ini file not found!");
 

@@ -696,19 +696,6 @@ void ParticleManager::OpenDefaultProject()
 
     SetProjectTexture("particles_list.tga");
 
-    /*HANDLE foundFile;
-    WIN32_FIND_DATA findData;
-    if ((foundFile = fio->d_FindFirstFile("resource\\particles\\*.xps", &findData)) != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            // core.Trace("Cache system - %s", findData.cFileName);
-            std::string FileName = utf8::ConvertWideToUtf8(findData.cFileName);
-            pDataCache->CacheSystem(FileName.c_str());
-        } while (fio->_FindNextFile(foundFile, &findData) == TRUE);
-        if (foundFile != INVALID_HANDLE_VALUE)
-            fio->_FindClose(foundFile);
-    }*/
     const auto vFilenames = fio->_GetPathsOrFilenamesByMask("resource\\particles", "*.xps", false);
     for (std::string curName : vFilenames)
     {

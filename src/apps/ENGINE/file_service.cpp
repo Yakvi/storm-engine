@@ -166,24 +166,6 @@ std::filesystem::file_time_type FILE_SERVICE::_GetLastWriteTime(const char *file
 
 }
 
-/*HANDLE FILE_SERVICE::_FindFirstFile(const char *lpFileName, LPWIN32_FIND_DATA lpFindFileData)
-{
-    HANDLE hFile;
-    std::wstring filePathW = utf8::ConvertUtf8ToWide(lpFileName);
-    hFile = FindFirstFile(filePathW.c_str(), lpFindFileData);
-    return hFile;
-}
-
-BOOL FILE_SERVICE::_FindNextFile(HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData)
-{
-    return FindNextFile(hFindFile, lpFindFileData);
-}
-
-BOOL FILE_SERVICE::_FindClose(HANDLE hFindFile)
-{
-    return FindClose(hFindFile);
-}*/
-
 void FILE_SERVICE::_FlushFileBuffers(std::fstream &fileS)
 {
     fileS.flush();

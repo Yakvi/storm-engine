@@ -194,43 +194,6 @@ void CXI_PICTURE::SetNewPicture(bool video, char *sNewTexName)
 
 void CXI_PICTURE::SetNewPictureFromDir(char *dirName)
 {
-    /*int findQ;
-    WIN32_FIND_DATA wfd;
-    char param[512];
-
-    sprintf_s(param, "resource\\textures\\%s\\*.tx", dirName);
-
-    auto *h = fio->d_FindFirstFile(param, &wfd);
-    for (findQ = 0; h != INVALID_HANDLE_VALUE;)
-    {
-        findQ++;
-        if (!fio->_FindNextFile(h, &wfd))
-            break;
-    }
-    if (h != INVALID_HANDLE_VALUE)
-        fio->_FindClose(h);
-
-    if (findQ > 0)
-    {
-        findQ = rand() % findQ;
-        h = fio->d_FindFirstFile(param, &wfd);
-        if (h != INVALID_HANDLE_VALUE)
-            for (; findQ > 0; findQ--)
-            {
-                if (!fio->_FindNextFile(h, &wfd))
-                    break;
-            }
-        if (h != INVALID_HANDLE_VALUE)
-        {
-            fio->_FindClose(h);
-            std::string FileName = utf8::ConvertWideToUtf8(wfd.cFileName);
-            sprintf(param, "%s\\%s", dirName, FileName.c_str());
-            const int paramlen = strlen(param);
-            if (paramlen < sizeof(param) && paramlen >= 3)
-                param[paramlen - 3] = 0;
-            SetNewPicture(false, param);
-        }
-    }*/
     char param[512];
     sprintf(param, "resource\\textures\\%s", dirName);
 

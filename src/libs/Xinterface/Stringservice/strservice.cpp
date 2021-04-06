@@ -1350,14 +1350,6 @@ uint32_t _InterfaceCheckFolder(VS_STACK *pS)
         return IFUNCRESULT_FAILED;
     }
     char *sFolderName = pDat->GetString();
-    /*long nSuccess = false;
-    WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->d_FindFirstFile(sFolderName, &wfd);
-    if (h != INVALID_HANDLE_VALUE)
-    {
-        fio->_FindClose(h);
-        nSuccess = true;
-    }*/
     long nSuccess = fio->_FileOrDirectoryExists(sFolderName);
     pDat = (VDATA *)pS->Push();
     if (!pDat)
@@ -1403,26 +1395,6 @@ uint32_t _InterfaceFindFolders(VS_STACK *pS)
     {
         return IFUNCRESULT_FAILED;
     }
-    /*char *sFindTemplate = pDat->GetString();
-    WIN32_FIND_DATA wfd;
-    const HANDLE h = fio->d_FindFirstFile(sFindTemplate, &wfd);
-    long n = 0;
-    if (h != INVALID_HANDLE_VALUE)
-        do
-        {
-            if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            {
-                if (wfd.cFileName[0] != L'.')
-                {
-                    char pctmp[64];
-                    sprintf_s(pctmp, "f%d", n++);
-                    std::string FileName = utf8::ConvertWideToUtf8(wfd.cFileName);
-                    pA->SetAttribute(pctmp, FileName.c_str());
-                }
-            }
-        } while (fio->_FindNextFile(h, &wfd));
-    if (h != INVALID_HANDLE_VALUE)
-        fio->_FindClose(h);*/
     char *sFindTemplate = pDat->GetString();
     std::filesystem::path p = std::filesystem::u8path(sFindTemplate);
     const auto mask = p.filename().string();
